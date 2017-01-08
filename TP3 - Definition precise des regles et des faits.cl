@@ -25,7 +25,7 @@
 ;;          (personne la plus grande : 272cm https://en.wikipedia.org/wiki/List_of_tallest_people#Men)
 ;;      - linkMaterial 
 ;;          (Corde d'escalade : http://climbing.about.com/od/climbingropes/fl/Can-a-Climbing-Rope-Break-in-a-Fall.htm)
-;;      - objects
+;;      - object
 ;;          (Outils de crochetage : http://www.wikihow.com/Pick-a-Lock)
 ;;        Proportions humaines pour la récupération d'objets :
 ;;          (On considère la taille des jambes comme étant 52.5% de la taille de la personne,
@@ -49,16 +49,15 @@
 ;;      - personStrength є {0, 1, 2, 3, 4}
 ;;      - personLockPicking є {0, 1, 2, 3}
 ;;      - roomHeight є [180, 500]
-;;      - door є {locked, open}
 ;;      - doorMaterial є {rawWood, chipBoard, metal, glass, plastic}
 ;;                       (bois brut, aggloméré, verre, plastique)
 ;;      - linkMaterial є {climbingRope, rustySteelChains, steelChains, twine, belt, plasticClamp}
 ;;                       (corde d'escalade, chaines rouillées, chaines inox, ficelle, ceinture, serrage plastique)
-;;      - (cadr object) є {knife, axe, tensionWrench, pick, chainKey, doorKey, chair, speaker, camera, brokenGlass, glassBottle, hammer, bigWoodStick}
+;;      - (cadr object) є {knife, axe, chainKey, doorKey, chair, speaker, camera, brokenGlass, glassBottle, hammer, bigWoodStick}
 ;;                        (couteau, hache, tendeur, piquet, clé chaines, clé porte, chaise, haut Parleur, caméra, morceau de verre, bouteille de verre, marteau, gros morceau de bois)
 ;;      - (caddr object) є [0, roomSize/2]
 
-;; Ordre de priorité :
+;; Profondeur :
 ;;      - Se détacher les mains
 ;;      - Ouvrir la porte
 ;;      - Sortir de la salle
@@ -67,14 +66,11 @@
 ;;      - vérification des données et demande des données nécessaires
 ;;      - personLegSize = personHeight*0.525
 ;;      - objectDistance = (caddr object)
-;;      - linkBreakingStrengh = personLockPicking + personStrength + max(max(objectLinkLockPicking, objectLockPicking), objectStrength)
-;;      - doorOpeningStrength = max(personLockPicking + max(objectLinkLockPicking, objectDoorPicking), personStrengh + objectStrength)
 
 ;; Règles (caddr = function to apply. Si = nil, equal)
 ;;      Récupérer un objet
 ;;      - (object knife) && ((personLegSize >= knifeDistance) || (hands free)) => (possessedObject knife)
 ;;      - (object axe) && ((personLegSize >= axeDistance) || (hands free)) => (possessedObject axe)
-;;      - (object tensionWrench) && ((personLegSize >= tensionWrenchDistance) || (hands free)) => (possessedObject tensionWrench)
 ;;      - (object pick) && ((personLegSize >= pickDistance) || (hands free)) => (possessedObject pick)
 ;;      - (object chainKey) && ((personLegSize >= chainKeyDistance) || (hands free)) => (possessedObject chainKey)
 ;;      - (object doorKey) && ((personLegSize >= doorKeyDistance) || (hands free)) => (possessedObject doorKey)
@@ -89,12 +85,11 @@
 ;;      - (possessedObject glassBottle) => (possessedObject brokenGlass)
 ;;      - (possessedObject camera) => (possessedObject brokenGlass)
 ;;      Utiliser des objets
-;;      - (possessedObject camera) => (objectStrength 1)
-;;      - (possessedObject knife) => (objectStrength 2)
-;;      - (possessedObject bigWoodStick) => (objectStrength 3)
-;;      - (possessedObject axe) => (objectStrength 4)
-;;      - (possessedObject hammer) => (objectStrength 5)
-;;      - (possessedObject tensionWrench) => (objectLockPicking 2)
+;;      - (possessedObject camera) => (objecttrength 1)
+;;      - (possessedObject knife) => (objecttrength 2)
+;;      - (possessedObject bigWoodStick) => (objecttrength 3)
+;;      - (possessedObject axe) => (objecttrength 4)
+;;      - (possessedObject hammer) => (objecttrength 5)
 ;;      - (possessedObject pick) => (objectLockPicking 2)
 ;;      - (possessedObject brokenGlass) => (objectLinkLockPicking 1)
 ;;      - (possessedObject chainKey) && ((linkMaterial rustySteelChains) || (linkMaterial steelChains)) => (objectLinkLockPicking 42)
@@ -120,72 +115,106 @@
 ;;      - (door open) => (you escaped)
 
 ;; Exemple de Base de Faits (Fact Base)
+;; (setq *FB*
+;;     '(
+;;         (personHeight 177)
+;;         (personStrength 2)
+;;         (personLockPicking 3)
+;;         (roomHeight 250)
+;;         (doorMaterial metal)
+;;         (linkMaterial twine)
+;; 		(object knife)
+;; 		(object glassBottle)
+;; 		(knifeDistance 20)
+;; 		(glassBottleDistance 250)
+;;     )
+;; )
+
 (setq *FB*
     '(
         (personHeight 177)
         (personStrength 2)
-        (personLockPicking 1)
+        (personLockPicking 3)
         (roomHeight 250)
-        (door locked)
         (doorMaterial metal)
-        (linkMaterial rustySteelChains)
-        (objects
-            (knife 20)
-            (glassBottle 250)
-            (pick 200)
-            (tensionWrench 150)
-        )
+        (linkMaterial twine)
+		(object knife)
+		(object glassBottle)
+		(knifeDistance 20)
+		(glassBottleDistance 250)
     )
 )
+
+;; (setq *FB*
+;; 	'(
+;; 		(hands free)
+;; 		(personStrength 2)
+;; 		(doorMaterial glass)
+;; 	)
+;; )
+
 
 ;; Représentation de la Base de Règles (Rule Base)
 
 (setq *RB* '(
 ;;  Récupérer un objet
-	(OKN (((object knife find) ((personLegSize knifeDistance >=) (hands free) or) and) (possessedObject knife))
-	(OAX (((object axe find) ((personLegSize axeDistance >=) (hands free) or) and) (possessedObject axe))
-	(OTW (((object tensionWrench find) ((personLegSize tensionWrenchDistance >=) (hands free) or) and) (possessedObject tensionWrench))
-	(OPI (((object pick find) ((personLegSize pickDistance >=) (hands free) or) and) (possessedObject pick))
-	(OCK (((object chainKey find) ((personLegSize chainKeyDistance >=) (hands free) or) and) (possessedObject chainKey))
-	(ODK (((object doorKey find) ((personLegSize doorKeyDistance >=) (hands free) or) and) (possessedObject doorKey))
-	(OCH (((object chair find) ((personLegSize chairDistance >=) (hands free) or) and) (possessedObject chair))
-	(OGL (((object brokenGlass find) ((personLegSize brokenGlassDistance >=) (hands free) or) and) (possessedObject brokenGlass))
-	(OGB (((object glassBottle find) ((personLegSize glassBottleDistance >=) (hands free) or) and) (possessedObject glassBottle))
-	(OHA (((object hammer find) ((personLegSize hammerDistance >=) (hands free) or) and) (possessedObject hammer))
-	(OWS (((object bigWoodStick find) ((personLegSize bigWoodStickDistance >=) (hands free) or) and) (possessedObject bigWoodStick))
-	(OCA (((object camera find) ((personLegSize cameraDistance >=) (hands free) or) and) (possessedObject camera))
+	(OKN ((knife object find-object) (knifeDistance personLegSize <=)) (possessedObject knife))
+	(OAX ((axe object find-object) (axeDistance personLegSize <=)) (possessedObject axe))
+	(OCK ((chainKey object find-object) (chainKeyDistance personLegSize <=)) (possessedObject chainKey))
+	(ODK ((doorKey object find-object) (doorKeyDistance personLegSize <=)) (possessedObject doorKey))
+	(OCH ((chair object find-object) (chairDistance personLegSize <=)) (possessedObject chair))
+	(OGL ((brokenGlass object find-object) (brokenGlassDistance personLegSize <=)) (possessedObject brokenGlass))
+	(OGB ((glassBottle object find-object) (glassBottleDistance personLegSize <=)) (possessedObject glassBottle))
+	(OHA ((hammer object find-object) (hammerDistance personLegSize <=)) (possessedObject hammer))
+	(OWS ((bigWoodStick object find-object) (bigWoodStickDistance personLegSize <=)) (possessedObject bigWoodStick))
+;;	Récupérer un objet en ayant les mains libres
+	(OKN ((knife object find-object) (hands free)) (possessedObject knife))
+	(OAX ((axe object find-object) (hands free)) (possessedObject axe))
+	(OCK ((chainKey object find-object) (hands free)) (possessedObject chainKey))
+	(ODK ((doorKey object find-object) (hands free)) (possessedObject doorKey))
+	(OCH ((chair object find-object) (hands free)) (possessedObject chair))
+	(OGL ((brokenGlass object find-object) (hands free)) (possessedObject brokenGlass))
+	(OGB ((glassBottle object find-object) (hands free)) (possessedObject glassBottle))
+	(OHA ((hammer object find-object) (hands free)) (possessedObject hammer))
+	(OWS ((bigWoodStick object find-object) (hands free)) (possessedObject bigWoodStick))
+	(OCA ((camera object find-object) (hands free)) (possessedObject camera))
 ;;  Récupérer le haut parleur accroché au plafond
-	(OSP (((hands free) ((((personHeight 0.9 *) (/ personHeight 3) +) roomHeight >=) (hands free) or)) (possessedObject bigWoodStick))
+	(OSP ((hands free) (((personHeight 0.9 *) (personHeight 3 /) +) roomHeight >=)) (possessedObject camera))
 ;;  Casser des objets
-	(BCH ((possessedObject chair find) (possessedObject bigWoodStick))
-	(BGB ((possessedObject glassBottle find) (possessedObject brokenGlass))
-	(BCA ((possessedObject camera find) (possessedObject brokenGlass))
-;;  Utiliser des objets
-	(UCA ((possessedObject camera find) (objectStrength 1))
-	(UKN ((possessedObject knife find) (objectStrength 2))
-	(UWS ((possessedObject bigWoodStick find) (objectStrength 3))
-	(UAX ((possessedObject axe find) (objectStrength 4))
-	(UHA ((possessedObject hammer find) (objectStrength 5))
-	(UTW ((possessedObject tensionWrench find) (objectLockPicking 2))
-	(UPI ((possessedObject pick find) (objectLockPicking 2))
-	(UGL ((possessedObject brokenGlass find) (objectLockPicking 1))
-	(UCK (((possessedObject chainKey find) ((linkMaterial rustySteelChains) (linkMaterial steelChains) or)) (objectLinkLockPicking 42))
-	(UDK ((possessedObject doorKey find) (objectDoorLockPicking 42))
+	(BCH ((chair possessedObject find-object)) (possessedObject bigWoodStick))
+	(BGB ((glassBottle possessedObject find-object)) (possessedObject brokenGlass))
+	(BCA ((camera possessedObject find-object)) (possessedObject brokenGlass))
 ;;  Casser ses liens
-	(LTW ((linkMaterial twine) (linkHardness 1))
-	(LBE ((linkMaterial belt) (linkHardness 2))
-	(LPC ((linkMaterial plasticClamp) (linkHardness 3))
-	(LCR ((linkMaterial climbingRope) (linkHardness 4))
-	(LRC ((linkMaterial rustySteelChains) (linkHardness 5))
-	(LSC ((linkMaterial steelChains) (linkHardness 6))
-	(LBR ((linkBreakingStrengh linkHardness >=) (hands free))
-;;  Ouvrir la porte
-	(DGL ((doorMaterial glass) (doorHardness 3))
-	(DCB ((doorMaterial chipBoard) (doorHardness 4))
-	(DPL ((doorMaterial plastic) (doorHardness 5))
-	(DRW ((doorMaterial rawWood) (doorHardness 6))
-	(DME ((doorMaterial metal) (doorHardness 7))
-	(DOP ((doorOpeningStrength doorHardness >=) (door open))
+	(UKN ((personStrength 3 >=) (linkMaterial twine)) (hands free))
+	(UKN ((personStrength 4 >=) (linkMaterial belt)) (hands free))
+	(UKN ((knife possessedObject find-object) (linkMaterial twine)) (hands free))
+	(UKN ((knife possessedObject find-object) (linkMaterial belt)) (hands free))
+	(UKN ((knife possessedObject find-object) (linkMaterial plasticClamp)) (hands free))
+	(UKN ((knife possessedObject find-object) (linkMaterial climbingRope) (personStrength 3 >=)) (hands free))
+	(UKN ((brokenGlass possessedObject find-object) (linkMaterial twine)) (hands free))
+;; Crocheter ses liens
+	(UTW ((chainKey possessedObject find-object) (linkMaterial rustySteelChains)) (hands free))
+	(UTW ((chainKey possessedObject find-object) (linkMaterial steelChains)) (hands free))
+;;  Casser la porte
+	(DPLCA ((hands free) (doorMaterial glass) (personStrength 2 >=)) (door open))
+	(DPLCA ((hands free) (doorMaterial chipBoard) (personStrength 3 >=)) (door open))
+	(DPLCA ((hands free) (doorMaterial plastic) (personStrength 4 =)) (door open))
+	(DGLCA ((hands free) (camera possessedObject find-object) (doorMaterial glass) (personStrength 2 >=)) (door open))
+	(DCBCA ((hands free) (camera possessedObject find-object) (doorMaterial chipBoard) (personStrength 3 >=)) (door open))
+	(DPLCA ((hands free) (bigWoodStick possessedObject find-object) (doorMaterial glass)) (door open))
+	(DPLCA ((hands free) (bigWoodStick possessedObject find-object) (doorMaterial chipBoard)) (door open))
+	(DPLCA ((hands free) (bigWoodStick possessedObject find-object) (doorMaterial plastic) (personStrength 2 >=)) (door open))
+	(DPLCA ((hands free) (hammer possessedObject find-object) (doorMaterial glass)) (door open))
+	(DPLCA ((hands free) (hammer possessedObject find-object) (doorMaterial chipBoard)) (door open))
+	(DPLCA ((hands free) (hammer possessedObject find-object) (doorMaterial plastic)) (door open))
+	(DPLCA ((hands free) (hammer possessedObject find-object) (doorMaterial rawWood) (personStrength 3 >=)) (door open))
+	(DPLCA ((hands free) (axe possessedObject find-object) (doorMaterial glass)) (door open))
+	(DPLCA ((hands free) (axe possessedObject find-object) (doorMaterial chipBoard)) (door open))
+	(DPLCA ((hands free) (axe possessedObject find-object) (doorMaterial plastic)) (door open))
+	(DPLCA ((hands free) (axe possessedObject find-object) (doorMaterial rawWood) (personStrength 2 >=)) (door open))
+;; Crocheter la porte
+	(DCRKN ((hands free) (knife possessedObject find-object) (personLockPicking 2 >=)) (door open))
+	(OS42 ((doorKey possessedObject find-object)) (door open))
 ;;  Sortir de la salle et gagner
-	(WIN ((door open) (you escaped))
+	(WIN ((door open)) (you escaped))
 ))

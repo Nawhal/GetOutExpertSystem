@@ -103,21 +103,21 @@
 
 ; Return the value of a numeric condition by doing its operation
 (defun eval-numeric (condition)
-	(format t "condition de eval-numeric ~s~%" condition)
+	;(format t "condition de eval-numeric ~s~%" condition)
 
 	(cond 
 		((equal (first condition) t)
-			(format t "res t = ~s~%" (eval (list (third condition) (first condition) (second condition))))
+			;(format t "res t = ~s~%" (eval (list (third condition) (first condition) (second condition))))
 		)
 		((or (equal (second condition) 'object) (equal (second condition) 'possessedObject))
-			(format t "(apply ~s (~s ~s))" (third condition) (first condition) (assoc-multi (second condition) *FB*))
-			(format t "res list = ~s~%" (apply (third condition) (list (first condition) (assoc-multi (second condition) *FB*))))
+			;(format t "(apply ~s (~s ~s))" (third condition) (first condition) (assoc-multi (second condition) *FB*))
+			;(format t "res list = ~s~%" (apply (third condition) (list (first condition) (assoc-multi (second condition) *FB*))))
 		)
 		((assoc-multi (first condition) *FB*)
-			(format t "res atom = ~s~%" (eval (list (third condition) (second (assoc-multi (first condition) *FB*)) (second condition))))
+			;(format t "res atom = ~s~%" (eval (list (third condition) (second (assoc-multi (first condition) *FB*)) (second condition))))
 		)
 		(t
-			(format t "res nil = ~s~%" nil)
+			;(format t "res nil = ~s~%" nil)
 		)
 	)
 
@@ -155,7 +155,7 @@
 			(setq personLegSize (* 0.525 personHeight))
 			(loop while (not (numberp personHeight))
 				do (progn
-					;(format t "Veuillez indiquer la taille de la personne captive.~%")
+					(format t "Veuillez indiquer la taille de la personne captive.~%")
 					(setq personHeight (read))
 				)
 			)
@@ -198,14 +198,14 @@
 			)
 		)
 		(when ok
-			(format t "yay ~s is ok~%" rule)
 			(unless (find (conclusion rule) *FB* :test #'equal)
+				(format t "[DONE] ~s~%" rule)
 				(push (conclusion rule) *FB*)
 			)
 		)
-		(unless ok
-			(format t "oooooooooooooh ~s is not ok~%" rule)
-		)
+		;(unless ok
+		;	(format t "oooooooooooooh ~s is not ok~%" rule)
+		;)
 		ok
 	)
 )

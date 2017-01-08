@@ -130,28 +130,28 @@
 ;;     )
 ;; )
 
-(setq *FB*
-    '(
-        (personHeight 177)
-        (personStrength 2)
-        (personLockPicking 3)
-        (roomHeight 250)
-        (doorMaterial metal)
-        (linkMaterial twine)
-		(object knife)
-		(object glassBottle)
-		(knifeDistance 20)
-		(glassBottleDistance 250)
-    )
-)
-
 ;; (setq *FB*
-;; 	'(
-;; 		(hands free)
-;; 		(personStrength 2)
-;; 		(doorMaterial glass)
-;; 	)
+;;     '(
+;;         (personHeight 150)
+;;         (personStrength 4)
+;;         (personLockPicking 0)
+;;         (roomHeight 100)
+;;         (doorMaterial rawWood)
+;;         (linkMaterial belt)
+;; 		(object hammer)
+;; 		(hammerDistance 20)
+;;     )
 ;; )
+
+(setq *FB*
+	'(
+		(personStrength 3)
+		(doorMaterial metal)
+		(linkMaterial steelChains)
+		(object doorKey)
+		(doorKeyDistance 100)
+	)
+)
 
 
 ;; Représentation de la Base de Règles (Rule Base)

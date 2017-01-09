@@ -155,7 +155,7 @@
 
 ;Fonction escape
 (defun escape ()
-	(let ((personHeight (second (assoc-multi 'personHeight *FB*))))
+	(let ((personHeight (second (assoc-multi 'personHeight *FB*))) (result nil))
 		(if personHeight
 			(setq personLegSize (* 0.525 personHeight))
 			(loop while (not (numberp personHeight))
@@ -165,8 +165,13 @@
 				)
 			)
 		)
+		(setq result (check '(you escaped)))
+		(if result
+			(format t "Vous avez gagne !")
+			(format t "Vous ne pouvez sortir de la salle. Vous mourrez de faim dans cette cave humide et sombre.")
+		)
+		result
 	)
-	(check '(you escaped))
 )
 
 ;Fonction check

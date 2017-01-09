@@ -53,10 +53,6 @@
   (dotimes (i depth) (format t "    "))
 )
 
-(defun ruleName (rule)
-	rule
-)
-
 ;Règles candidates
 (defun candidate-rules (goal)
     (let ((result nil) candidateName)
@@ -74,6 +70,11 @@
     )
 )
 
+; Returns the name of a rule
+(defun ruleName (rule)
+	(car rule)
+)
+
 ; Returns the conditions of a rule
 (defun conditions (rule)
 	(cadr rule)
@@ -84,6 +85,10 @@
 	(caddr rule)
 )
 
+; Prints the description of the rule
+(defun print-rule (rule)
+	(format t "~a~%" (cadddr rule))
+)
 
 ; Evaluates a condition
 (defun eval-condition (condition &optional (depth 0))
@@ -155,7 +160,7 @@
 			(setq personLegSize (* 0.525 personHeight))
 			(loop while (not (numberp personHeight))
 				do (progn
-					(format t "Veuillez indiquer la taille de la personne captive.~%")
+					(format t "Veuillez indiquer la taille de la personne captive : ")
 					(setq personHeight (read))
 				)
 			)
@@ -177,8 +182,8 @@
 			(loop for rule in (candidate-rules goal)
 			    while (not done)
 			    do
-				(unless (find rule *currentPath*)
-					(push rule *currentPath*)
+				(unless (find (ruleName rule) *currentPath*)
+					(push (ruleName rule) *currentPath*)
 					(setq done (check_and rule))
 				)
 			)
@@ -199,7 +204,7 @@
 		)
 		(when ok
 			(unless (find (conclusion rule) *FB* :test #'equal)
-				(format t "[DONE] ~s~%" rule)
+				(print-rule rule)
 				(push (conclusion rule) *FB*)
 			)
 		)

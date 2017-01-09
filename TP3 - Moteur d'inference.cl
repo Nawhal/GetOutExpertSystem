@@ -112,7 +112,7 @@
 
 	(cond 
 		((equal (first condition) t)
-			;(format t "res t = ~s~%" (eval (list (third condition) (first condition) (second condition))))
+			(format t "res t = ~s~%" (eval (list (third condition) (first condition) (second condition))))
 		)
 		((or (equal (second condition) 'object) (equal (second condition) 'possessedObject))
 			;(format t "(apply ~s (~s ~s))" (third condition) (first condition) (assoc-multi (second condition) *FB*))
@@ -166,11 +166,7 @@
 			)
 		)
 	)
-	;(when (check '(hands free))
-	;	(when (check '(door open))
-			(check '(you escaped))
-	;	)
-	;)
+	(check '(you escaped))
 )
 
 ;Fonction check
@@ -208,9 +204,6 @@
 				(push (conclusion rule) *FB*)
 			)
 		)
-		;(unless ok
-		;	(format t "oooooooooooooh ~s is not ok~%" rule)
-		;)
 		ok
 	)
 )

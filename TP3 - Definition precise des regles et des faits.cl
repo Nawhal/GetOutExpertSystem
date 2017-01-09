@@ -169,7 +169,7 @@
 	(BRWAX ((hands free) (axe possessedObject find-object) (doorMaterial rawWood) (personStrength 2 >=)) (door open) "Vous cassez la porte a l'aide de votre hache.")
 ;; Crocheter la porte
 	(BDRKN ((hands free) (knife possessedObject find-object) (personLockPicking 2 >=)) (door open) "Vous crochetez la serrure de la porte a l'aide de votre couteau.")
-	(BDRDK ((doorKey possessedObject find-object)) (door open) "Vous ouvrez la porte grace a votre cle.")
+	(BDRDK ((hands free) (doorKey possessedObject find-object)) (door open) "Vous ouvrez la porte grace a votre cle.")
 ;;  Sortir de la salle et gagner
 	(WIN ((door open)) (you escaped) "Vous pouvez enfin sortir ! Alors que vous depassez le pas de la porte, la voix vous felicite dans un dernier ricanement.")
 ))

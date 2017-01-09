@@ -19,31 +19,6 @@
 ;;      - les objets et leur éloignement de la personne
 ;;              Note : les objets possédés sont à 0 d'éloignement
 
-;; Sources
-;;      - personHeight
-;;          (personne la plus petite : 54.6cm https://en.wikipedia.org/wiki/List_of_shortest_people#Men)
-;;          (personne la plus grande : 272cm https://en.wikipedia.org/wiki/List_of_tallest_people#Men)
-;;      - linkMaterial 
-;;          (Corde d'escalade : http://climbing.about.com/od/climbingropes/fl/Can-a-Climbing-Rope-Break-in-a-Fall.htm)
-;;      - object
-;;          (Outils de crochetage : http://www.wikihow.com/Pick-a-Lock)
-;;        Proportions humaines pour la récupération d'objets :
-;;          (On considère la taille des jambes comme étant 52.5% de la taille de la personne,
-;;          en considérant que la personne est adulte et qu'on prend la moyenne du pourcentage présenté
-;;          sur le schéma suivant : https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2872302/#__sec12title)
-;;          ("An average person, is generally 7-and-a-half heads tall (including the head)"
-;;           La taille de la tête de la personne sera sonc de personHeight/7.5
-;;           https://en.wikipedia.org/wiki/Body_proportions)
-;;          (On considère que la main d'une personne mesure : personHeight*0.75/7.5 = personHeight*0.1
-;;          et que le bras d'une personne mesure : personHeight*3.5/7.5 = personHeight*7/15
-;;           http://www.paintdrawpaint.com/2011/01/drawing-basics-proportions-of-arm.html)
-;;          (On considère qu'une personne debout à bras levés peut attraper quelque chose à la hauteur de :
-;;           sa hauteur - celle de sa tête + celle de son bras - celle de sa main.
-;;           => personHeight - personHeight/7.5 + personHeight*7/15 - personHeight*0.1
-;;           => personHeight - personHeight*0.1 - personHeight*2/15 + personHeight*7/15
-;;           => personHeight*0.9 + personHeight*5/15
-;;           => personHeight*0.9 + personHeight*1/3)
-
 ;; Valeurs possibles
 ;;      - personHeight є [50, 280]
 ;;      - personStrength є {0, 1, 2, 3, 4}
@@ -53,9 +28,8 @@
 ;;                       (bois brut, aggloméré, verre, plastique)
 ;;      - linkMaterial є {climbingRope, rustySteelChains, steelChains, twine, belt, plasticClamp}
 ;;                       (corde d'escalade, chaines rouillées, chaines inox, ficelle, ceinture, serrage plastique)
-;;      - (cadr object) є {knife, axe, chainKey, doorKey, chair, speaker, camera, brokenGlass, glassBottle, hammer, bigWoodStick}
-;;                        (couteau, hache, tendeur, piquet, cle chaines, cle porte, chaise, haut Parleur, camera, morceau de verre, bouteille de verre, marteau, gros morceau de bois)
-;;      - (caddr object) є [0, roomSize/2]
+;;      - object є {knife, axe, chainKey, doorKey, chair, camera, brokenGlass, glassBottle, hammer, bigWoodStick}
+;;                       (couteau, hache, cle chaines, cle porte, chaise, camera, morceau de verre, bouteille de verre, marteau, gros morceau de bois)
 
 ;; Profondeur :
 ;;      - Se détacher les mains
@@ -65,24 +39,23 @@
 ;; Initialisation :
 ;;      - vérification des données et demande des données nécessaires
 ;;      - personLegSize = personHeight*0.525
-;;      - objectDistance = (caddr object)
 
 ;; Exemple de Bases de Faits (Fact Base)
 
-;; (setq *FB*
-;; 	'(
-;; 		(personHeight 177)
-;; 		(personStrength 2)
-;; 		(personLockPicking 3)
-;; 		(roomHeight 250)
-;; 		(doorMaterial metal)
-;; 		(linkMaterial twine)
-;; 		(object knife)
-;; 		(knifeDistance 20)
-;; 		(object glassBottle)
-;; 		(glassBottleDistance 250)
-;; 	)
-;; )
+(setq *FB*
+	'(
+		(personHeight 177)
+		(personStrength 2)
+		(personLockPicking 3)
+		(roomHeight 250)
+		(doorMaterial metal)
+		(linkMaterial twine)
+		(object knife)
+		(knifeDistance 20)
+		(object glassBottle)
+		(glassBottleDistance 250)
+	)
+)
 
 ;; (setq *FB*
 ;; 	'(
@@ -97,15 +70,15 @@
 ;; 	)
 ;; )
 
-(setq *FB*
-	'(
-		(personStrength 3)
-		(doorMaterial metal)
-		(linkMaterial steelChains)
-		(object doorKey)
-		(doorKeyDistance 100)
-	)
-)
+;; (setq *FB*
+;; 	'(
+;; 		(personStrength 3)
+;; 		(doorMaterial metal)
+;; 		(linkMaterial steelChains)
+;; 		(object doorKey)
+;; 		(doorKeyDistance 100)
+;; 	)
+;; )
 
 
 ;; Représentation de la Base de Règles (Rule Base)

@@ -42,20 +42,20 @@
 
 ;; Exemple de Bases de Faits (Fact Base)
 
-(setq *FB*
-	'(
-		(personHeight 177)
-		(personStrength 2)
-		(personLockPicking 3)
-		(roomHeight 250)
-		(doorMaterial metal)
-		(linkMaterial twine)
-		(object knife)
-		(knifeDistance 20)
-		(object glassBottle)
-		(glassBottleDistance 250)
-	)
-)
+;; (setq *FB*
+;; 	'(
+;; 		(personHeight 177)
+;; 		(personStrength 2)
+;; 		(personLockPicking 3)
+;; 		(roomHeight 250)
+;; 		(doorMaterial metal)
+;; 		(linkMaterial twine)
+;; 		(object knife)
+;; 		(knifeDistance 20)
+;; 		(object glassBottle)
+;; 		(glassBottleDistance 250)
+;; 	)
+;; )
 
 ;; (setq *FB*
 ;; 	'(
@@ -82,6 +82,7 @@
 
 
 ;; Représentation de la Base de Règles (Rule Base)
+;; 51 regles
 
 (setq *RB* '(
 ;;  Récupérer un objet
@@ -140,7 +141,7 @@
 	(BCBAX ((hands free) (axe possessedObject find-object) (doorMaterial chipBoard)) (door open) "Vous cassez la porte a l'aide de votre hache.")
 	(BPLAX ((hands free) (axe possessedObject find-object) (doorMaterial plastic)) (door open) "Vous cassez la porte a l'aide de votre hache.")
 	(BRWAX ((hands free) (axe possessedObject find-object) (doorMaterial rawWood) (personStrength 2 >=)) (door open) "Vous cassez la porte a l'aide de votre hache.")
-;; Crocheter la porte
+;; 	Crocheter la porte
 	(BDRKN ((hands free) (knife possessedObject find-object) (personLockPicking 2 >=)) (door open) "Vous crochetez la serrure de la porte a l'aide de votre couteau.")
 	(BDRDK ((hands free) (doorKey possessedObject find-object)) (door open) "Vous ouvrez la porte grace a votre cle.")
 ;;  Sortir de la salle et gagner

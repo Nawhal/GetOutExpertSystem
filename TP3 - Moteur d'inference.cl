@@ -1,25 +1,5 @@
 (load "TP3 - Definition precise des regles et des faits.cl")
 
-;; Algo :
-;	function check(goal)
-;		done := FB.contains(goal)
-;		for rule in candidate-rules(goal) and while not done
-;			done := check_and(rule)
-;		end
-;		done
-;	end
-;;
-;	function check_and(rule)
-;		ok := true
-;		for p in previous(rule) and ok
-;			ok := check(p)
-;		end
-;		ok
-;	end
-
-
-
-
 ;;Fonctions de service
 
 (setq *currentPath* nil)
@@ -108,24 +88,6 @@
 
 ; Return the value of a numeric condition by doing its operation
 (defun eval-numeric (condition)
-	;(format t "condition de eval-numeric ~s~%" condition)
-
-	(cond 
-		((equal (first condition) t)
-			(format t "res t = ~s~%" (eval (list (third condition) (first condition) (second condition))))
-		)
-		((or (equal (second condition) 'object) (equal (second condition) 'possessedObject))
-			;(format t "(apply ~s (~s ~s))" (third condition) (first condition) (assoc-multi (second condition) *FB*))
-			;(format t "res list = ~s~%" (apply (third condition) (list (first condition) (assoc-multi (second condition) *FB*))))
-		)
-		((assoc-multi (first condition) *FB*)
-			;(format t "res atom = ~s~%" (eval (list (third condition) (second (assoc-multi (first condition) *FB*)) (second condition))))
-		)
-		(t
-			;(format t "res nil = ~s~%" nil)
-		)
-	)
-
 	(cond 
 		((equal (first condition) t)
         	(eval (list (third condition) (first condition) (second condition)))
@@ -145,8 +107,6 @@
 
 ; Return the value of a condition by checking wether a fact is in the factbase or not
 (defun eval-fact (condition)
-	;(format t "condition de eval-fact ~s~%" condition)
-	;(format t "res fact = ~s~%" (equal (second (assoc-multi (first condition) *FB*)) (second condition)))
     (equal (second (assoc-multi (first condition) *FB*)) (second condition))
 )
 
@@ -177,7 +137,6 @@
 ;Fonction check
 (defun check (goal)
 	(let ((done (eval-condition goal)))
-		;(format t "Goal = ~s~%" goal)
 		(when (not done)
 			;; If done is false
 			(loop for rule in (candidate-rules goal)
